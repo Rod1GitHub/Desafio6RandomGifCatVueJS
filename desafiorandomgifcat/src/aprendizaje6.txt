@@ -1,0 +1,74 @@
+html
+====
+<input id="id_titulo" type="text" v-model="titulo" />
+<select id="id_filtro" v-model="filtro">
+<button type="submit" @click="buildGift">Obtener mi gatito</button>
+<ViewGiftCat :url="giftCat" />
+
+
+script
+====
+import { getGiftByParamas } from "@/api";
+import ViewGiftCat from "@/components/ViewGiftCat";
+
+
+components: {
+    ViewGiftCat,
+  },
+  data() {
+    return {
+      titulo: "",
+      filtro: "",
+      color: "",
+      tamaño: "",
+      giftCat: "",
+    };
+  },
+  methods: {
+    async buildGift() {
+      const { titulo, filtro, color, tamaño } = this;
+      this.giftCat = await getGiftByParamas(titulo, filtro, color, tamaño);
+    },
+  },
+};
+
+
+
+
+api
+====
+export const BASE_URL_API = 'https://cataas.com/';
+export const BUILD_GIFT_BY_PARAMS = (titulo, filtro, color, tamaño) => `cat/gif/says/${titulo}?filter=${filtro}&color=${color}&size=${tamaño}&type=or`;
+
+/**
+ * 
+ * @param {string} titulo 
+ * @param {string} filtro 
+ * @param {string} color 
+ * @param {string} tamaño 
+ * @returns 
+ */
+export const getGiftByParamas = async (titulo, filtro, color, tamaño) => {
+    return await fetch(`${BASE_URL_API}${BUILD_GIFT_BY_PARAMS(titulo, filtro, color, tamaño)}`)
+        .then(response => {
+            console.log(response.url);
+            return response.url;
+        })
+        .catch(error => {
+            console.error({ error });
+        })
+}
+
+components
+==
+<template>
+  <img v-if="url !== ''" :src="url" alt="" srcset="" />
+</template>
+<script>
+export default {
+  name: "ViewGiftCat",
+  props: {
+    url: "",
+  },
+};
+</script>
